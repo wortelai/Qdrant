@@ -52,4 +52,5 @@ class Embeddings:
 
 # images_path = "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images"
 # embeddings = Embeddings()
+# embeddings.get_embedding("/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images/1943929.jpg")
 # points_list = embeddings.get_embeddings_across_imgs(images_path)
