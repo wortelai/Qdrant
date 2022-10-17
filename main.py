@@ -44,10 +44,9 @@ if __name__ == "__main__":
     # collection.delete_filtered_points(COLLECTION_NAME, search_img_path)
 
     #   Retrieve image based on a search result
-    # offset = 0
-    # results = collection.search(
-    #     search_img_path, COLLECTION_NAME, limit=1, offset=4, threshold=9.2
-    # )
+    results = collection.search(
+        search_img_path, COLLECTION_NAME, limit=1, offset=4, threshold=9.2
+    )
     # for result in results:
     #     print(f"image path: {result[0]}")
     #     print(f"similarity score: {result[1]}")
