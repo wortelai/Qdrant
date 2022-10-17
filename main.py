@@ -10,33 +10,34 @@ search_img_path = (
     "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images/1943929.jpg"
 )
 DATA_DIR = "/home/ahmad/Downloads/Qdrant_images/coin_data"
-COLLECTION_NAME = "images3"
+COLLECTION_NAME = "images"
 vector_size = 4096
 host = "localhost"
 port = 6333
 
-vectors_path = os.path.join(DATA_DIR, "vectors.npy")
 images_path = os.path.join(DATA_DIR, "coin_images")
-vectors = np.load(vectors_path)
-vector_size = vectors.shape[1]  # 4096
+# vectors_path = os.path.join(DATA_DIR, "vectors.npy")
+# vectors = np.load(vectors_path)
+# vector_size = vectors.shape[1]  # 4096
 
 embeddings = Embeddings()
 
 if __name__ == "__main__":
     collection = Qdrant(host, port, embeddings)
-    # vector_count = collection.get_collection_count(COLLECTION_NAME)
-    # print(
-    #     f"vector count in collection '{COLLECTION_NAME}': {vector_count}"
-    # )
+    vector_count = collection.get_collection_count(COLLECTION_NAME)
+    print(
+        f"vector count in collection '{COLLECTION_NAME}': {vector_count}"
+    )
 
     # Create a new index
-    collection.create_collection(vector_size, COLLECTION_NAME)
+    # collection.create_collection(vector_size, COLLECTION_NAME)
 
     # # Delete a new index
     # collection.delete_collection(COLLECTION_NAME)
 
     # Add new image to index
-    collection.upload_to_collection_from_vectors(vectors, images_path, COLLECTION_NAME)
+    # collection.upload_to_collection_from_vectors(vectors, images_path, COLLECTION_NAME)
+    # collection.upload_to_collection_from_path(images_path, COLLECTION_NAME)
     # collection.add_points(search_img_path, COLLECTION_NAME, [random.getrandbits(64)])
 
     # # Delete a new image from index
@@ -54,3 +55,17 @@ if __name__ == "__main__":
 
     # print(my_collection.retrieve_points([1001]))
     # print(collection.retrieve_filtered_count(COLLECTION_NAME,"image path", search_img_path))
+
+
+
+# # Reading image from a URL
+# from PIL import Image
+# import requests
+# from io import BytesIO
+# from embeddings import Embeddings
+# import numpy as np
+
+# src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+# response = requests.get(url=src)
+# img = Image.open(BytesIO(response.content))
+# print(np.array(Embeddings().get_embedding(image=img)).shape)
