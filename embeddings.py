@@ -3,6 +3,8 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import numpy as np
+import requests
+from io import BytesIO
 from models.vgg16_model import FeatureExtractor
 
 class Embeddings:
@@ -17,13 +19,19 @@ class Embeddings:
 
         self.model = FeatureExtractor()
 
-    def get_embedding(self, path_to_img=None, image=None):
-        if path_to_img:
-            PIL_image = Image.open(path_to_img).convert(
+    def get_embedding(self, path):
+
+        if os.path.exists(path):
+            PIL_image = Image.open(path).convert(
                 "RGB"
             )  # Converting to RGB, as some images in dataset are greyscale
-        if image:
-            PIL_image = image
+
+        if path[:4] == 'http':
+            response = requests.get(url=path)
+            PIL_image = Image.open(BytesIO(response.content)).convert(
+                "RGB"
+            )
+
         img_tensor = self.tr(PIL_image)
         img_expanded = torch.unsqueeze(img_tensor, dim=0)
         self.model.eval()

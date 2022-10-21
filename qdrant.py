@@ -29,7 +29,8 @@ class Qdrant:
             vectors_config=VectorParams(size=vector_size, distance="Cosine"),
         )
 
-    def upload_to_collection_from_vectors(self, vectors, images, collection_name, batch_size=256):
+    def upload_to_collection_from_file_path(self, vectors_path, images, collection_name, batch_size=256):
+        vectors = np.load(vectors_path)
         payload = self.get_payload(images)
         self.client.upload_collection(
             collection_name=collection_name,
@@ -40,7 +41,7 @@ class Qdrant:
             parallel=2,
         )
 
-    def upload_to_collection_from_path(self, images, collection_name, batch_size=256):
+    def upload_to_collection_from_image_path(self, images, collection_name, batch_size=256):
         points_list = self.embeddings.get_embeddings_across_imgs(images)
         vectors = np.array(points_list)
         payload = self.get_payload(images)
@@ -133,6 +134,8 @@ class Qdrant:
         return count
 
     def search(self, img, collection_name, limit=5, offset=0, threshold=0, filter: dict = None):
+        # modify this function so that img can be both a url, or a path of an image from local machine,
+        # or an image in the qdrant collection.
         results = []
         # Convert image into vector
         vector = self.embeddings.get_embedding(img)
