@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # )
 
     # Create a new index
-    collection.create_collection(vector_size, COLLECTION_NAME)
+    # collection.create_collection(vector_size, COLLECTION_NAME)
 
     # # Delete a new index
     # collection.delete_collection(COLLECTION_NAME)

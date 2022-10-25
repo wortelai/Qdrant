@@ -134,8 +134,6 @@ class Qdrant:
         return count
 
     def search(self, img, collection_name, limit=5, offset=0, threshold=0, filter: dict = None):
-        # modify this function so that img can be both a url, or a path of an image from local machine,
-        # or an image in the qdrant collection.
         results = []
         # Convert image into vector
         vector = self.embeddings.get_embedding(img)
