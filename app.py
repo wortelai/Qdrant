@@ -17,6 +17,10 @@ COLLECTION_NAME = "images"
 embeddings = Embeddings()
 collection = Qdrant(host, port, embeddings)
 
+@app.route('/')
+def hi():
+    return "Hello"  
+
 @app.route('/count')
 def count():   
     vector_count = collection.get_collection_count(COLLECTION_NAME)
@@ -46,4 +50,4 @@ def search():
     #  return f"{search_img_path}"
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(host = '0.0.0.0',port=8080, debug=True)
