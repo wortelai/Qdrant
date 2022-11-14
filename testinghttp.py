@@ -63,3 +63,4 @@ plt.savefig('/home/ahmad/Downloads/Qdrant_clean/img2.jpeg')
 
 response = requests.post(url=search_url, data= payload2)
 result = response.text
+print(result)

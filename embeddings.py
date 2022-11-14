@@ -31,7 +31,7 @@ class Embeddings:
         #     PIL_image = Image.open(BytesIO(response.content)).convert(
         #         "RGB"
         #     )
-        PIL_image = path
+        PIL_image = path  #Uncomment and run when running code for byte streams
         img_tensor = self.tr(PIL_image)
         img_expanded = torch.unsqueeze(img_tensor, dim=0)
         self.model.eval()
@@ -58,10 +58,10 @@ class Embeddings:
         return imgs_paths
 
 
-images_path = "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images"
-embeddings = Embeddings()
-image_path = "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images/1943929.jpg"
-img = Image.open(image_path)
-embeddings.get_embedding(img)
+# images_path = "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images"
+# embeddings = Embeddings()
+# image_path = "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images/1943929.jpg"
+# img = Image.open(image_path)
+# embeddings.get_embedding(img)
 
 # points_list = embeddings.get_embeddings_across_imgs(images_path)

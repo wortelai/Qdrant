@@ -18,7 +18,7 @@ class Qdrant:
         port=6333,
         embeddings = Embeddings()
     ):
-        self.client = QdrantClient(host="localhost", port=6333)
+        self.client = QdrantClient(host=host, port=port)
         self.host = host
         self.port = port
         self.embeddings = embeddings     
