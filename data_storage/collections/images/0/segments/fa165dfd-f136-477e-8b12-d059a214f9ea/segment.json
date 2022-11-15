@@ -1,0 +1,1 @@
+{"version":61,"config":{"vector_data":{"":{"size":4096,"distance":"Cosine"}},"index":{"type":"plain","options":{}},"storage_type":{"type":"in_memory"},"payload_storage_type":{"type":"in_memory"}}}

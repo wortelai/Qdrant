@@ -8,6 +8,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
 import qdrant_client.models as models
 from qdrant_client.http.models.models import Filter
+from PIL import Image
 
 from embeddings import Embeddings
 
@@ -41,7 +42,7 @@ class Qdrant:
             parallel=2,
         )
 
-    def upload_to_collection_from_image_path(self, images, collection_name, batch_size=256):
+    def upload_to_collection_from_image_stream(self, images, collection_name, batch_size=256):
         points_list = self.embeddings.get_embeddings_across_imgs(images)
         vectors = np.array(points_list)
         payload = self.get_payload(images)
@@ -62,28 +63,24 @@ class Qdrant:
         count = requests.get(url=url).json()['result']['vectors_count']
         return count
 
-    def get_payload(self, imgs_path):
-        imgs_paths = []
-        if ".jpg" in imgs_path:
-            imgs_paths.append({"image path": imgs_path})
-        else:
-            for file in os.listdir(imgs_path):
-                if ".jpg" in file:
-                    img_path = os.path.join(imgs_path, file)
-                    imgs_paths.append({"image path": img_path})
-        return imgs_paths
+    def get_payload(self, img_path):
+        payload = {}
+        payload["image path"] = img_path
+        return payload
 
 
-    def add_points(self, imgs_path, collection_name, ids):
-        vectors = self.embeddings.get_embeddings_across_imgs(imgs_path)
-        payloads = self.get_payload(imgs_path)
+    def add_points(self, img_path, img, collection_name, id):
+        vector = self.embeddings.get_embedding(img)
+        payload = self.get_payload(img_path)
         self.client.upsert(
             collection_name=collection_name,
-            points=models.Batch(
-                ids=ids,
-                payloads=payloads,
-                vectors=vectors
+            points= [
+                models.PointStruct(
+                id=id,
+                payload=payload,
+                vector=vector
             ),
+         ]
         )
 
     def retrieve_points(self, collection_name, ids):
@@ -171,10 +168,14 @@ class Qdrant:
 # img_path = (
 #     "/home/ahmad/Downloads/Qdrant_images/coin_data/coin_images/1943929.jpg"
 # )
-# my_collection = Qdrant(
-#     client=QdrantClient(host="localhost", port=6333), collection_name="images"
-# )
-# my_collection.add_points(img_path, [1001])
+# host = "localhost"
+# port = 6333
+# COLLECTION_NAME = "images"
+# embeddings = Embeddings()
+# my_collection = Qdrant(host, port, embeddings)
+
+# img = Image.open(img_path)
+# my_collection.add_points(img_path, img, COLLECTION_NAME, 1001)
 
 # print(my_collection.retrieve_points([1001]))
 # print(my_collection.search(img_path))
