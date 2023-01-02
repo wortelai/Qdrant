@@ -1,4 +1,4 @@
 [core]
     remote = remote_data
 ['remote "remote_data"']
-    url = s3://qdrantimages
+    url = s3://qdrantimages/data_and_model
