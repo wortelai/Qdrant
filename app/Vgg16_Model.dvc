@@ -1,0 +1,4 @@
+outs:
+- md5: 7b327224794bea30a5a4f58d9d1264fe
+  size: 469948214
+  path: Vgg16_Model

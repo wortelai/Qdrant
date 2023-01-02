@@ -1,0 +1,5 @@
+outs:
+- md5: 22125f258f4e2f3b9ae5b354a90635f3.dir
+  size: 215734346
+  nfiles: 1000
+  path: coin_images
