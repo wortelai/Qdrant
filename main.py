@@ -1,31 +1,22 @@
-import os
-import random
-from io import BytesIO
-from PIL import Image
 import requests
 import base64
+import json
 
-def create_collection(COLLECTION_NAME, vector_size):
+def create_collection(collection_name, vector_size):
     url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/create_index"
     
-    # curl -X POST -d "collection name=test&vector size=4096" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/create_index
-    
-    data = {"collection name": COLLECTION_NAME, "vector size": vector_size,}
+    data = {"collection name": collection_name, "vector size": vector_size,}
     response = requests.post(url=url, data=data)
-    print(response.text)
     if response.status_code==200:
         print(response.text)
     else:
         print('Something went wrong')
 
 
-def delete_collection(COLLECTION_NAME):
+def delete_collection(collection_name):
     url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/delete_index"
 
-    # curl -X POST -d "collection name=test" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/delete_index                 
-
-
-    data = {"collection name": COLLECTION_NAME}
+    data = {"collection name": collection_name}
     response = requests.post(url=url, data=data)
     if response.status_code==200:
         print(response.text)
@@ -33,89 +24,84 @@ def delete_collection(COLLECTION_NAME):
         print('Something went wrong')
 
 
-def add_vector_points(dir_name, COLLECTION_NAME):
+def add_vector_points(collection_name, img_path):
     url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/add_point"
-
-    image_file = open(dir_name, "rb")
     
-    files = {"file":  image_file}
-            
-    data = {
-        "collection name": COLLECTION_NAME,
-    }
-    response = requests.post(url=url, files=files, data=data)
-
-    if response.status_code==200:
-        print(f"{dir_name} has been added to {COLLECTION_NAME} collection.")
-    else:
-        return 'Something went wrong'
-    # curl -X POST -F "file=@/Users/zeeshan/Documents/Qdrant-App/coin_images/1695.jpg" -F "collection name=test" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/add_point
-    
-        
-        
-def delete_vector_point(vector_path, COLLECTION_NAME):
-    url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/delete_point"
-    
-    image_file = open(vector_path, "rb")
-
-        
-    files = {"file":  image_file}
+    image_file = open(img_path, 'rb')
+    image_data = base64.b64encode(image_file.read()).decode('utf-8')
     
     data = {
-        "collection name": COLLECTION_NAME,
-        "image path": vector_path,
+        'collection name': collection_name,
+        'path': img_path,
+        'image': image_data
     }
     
-    response = requests.post(url=url,files=files, data=data)
+    headers = {'Content-Type': 'application/json'}
+    
+    response = requests.post(url=url, data=json.dumps(data), headers=headers)
+
     if response.status_code==200:
         print(response.text)
     else:
         print('Something went wrong')
-    #curl -X POST -F "collection name=test" -F "file=@/Users/zeeshan/Documents/Qdrant-App/coin_images/1695.jpg" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/delete_point
+     
+        
+def delete_vector_point(collection_name, img_path):
+    url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/delete_point"
 
-def search_vector_point(search_img_path, COLLECTION_NAME,threshold, offset,limit):
+    data = {
+        'collection name': collection_name,
+        'path': img_path
+    }
+    
+    headers = {'Content-Type': 'application/json'}
+    
+    response = requests.post(url=url, data=json.dumps(data), headers=headers)
+    if response.status_code==200:
+        print(response.text)
+    else:
+        print('Something went wrong')
+
+def search_vector_point(collection_name, img_path, threshold, offset, limit):
     url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/search"
     
-    image_file = open(search_img_path, "rb")
-
-    files = {"file":  image_file}
-    
+    image_file = open(img_path, "rb")
+    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            
     data = {
-        "collection name": COLLECTION_NAME,
+        "collection name": collection_name,
         "limit": limit,
         "offset": offset,
         "threshold": threshold,
+        "image":image_data
     }
-    response = requests.post(url=url, headers=headers, files=files, params=data)
-    print(response.text)
+
+    headers = {'Content-Type': 'application/json'}
+    
+    response = requests.post(url=url, data=json.dumps(data), headers=headers)
     if response.status_code==200:
         print(response.text)
     else:
         print('Something went wrong')
         
-    # curl -X POST -F "file=@/Users/zeeshan/Documents/Qdrant-App/coin_images/1695.jpg" -F "collection name=test" -F "limit=10" -F "offset=0" -F "threshold=0" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/search
 
-
-
-def vectors_count(COLLECTION_NAME):
+def vectors_count(collection_name):
     url = "https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/count"
     
-    # curl -X POST -d "collection name=test" https://mzul3mezie.execute-api.us-west-2.amazonaws.com/Prod/count
-    
+
     data = {
-        "collection name": COLLECTION_NAME,
+        "collection name": collection_name,
     }
     response = requests.post(url=url, data=data)
     if response.status_code==200:
         print(response.text)
     else:
-        print(f'"{COLLECTION_NAME}" collection does not exist or Something went wrong')
+        print("test collection does not exist or Something went wrong")
 
 
 
 
 if __name__ == "__main__":
-    
     print("Which option in the following would you like to use?")
     print("1 - Create a new collection")
     print("2 - Delete a collection")
@@ -139,14 +125,14 @@ if __name__ == "__main__":
 
     elif(choice==3):
         COLLECTION_NAME = input("Collection Name:")
-        dir_name=input("Enter the path of the directory or image: ")
-        add_vector_points(dir_name, COLLECTION_NAME)
+        image_path=input("Enter the path of the directory or image: ")
+        add_vector_points(COLLECTION_NAME, image_path)
         
 
     elif(choice==4):
         COLLECTION_NAME = input("Collection Name:")
         delete_image_path=input("Enter the path of the image you want to delete: ")
-        delete_vector_point(delete_image_path,COLLECTION_NAME)
+        delete_vector_point(COLLECTION_NAME, delete_image_path)
 
 
     elif(choice==5):
@@ -155,7 +141,7 @@ if __name__ == "__main__":
         limit = int(input("limit [default 10]: ") or 10)
         offset = int(input("offset [default 0]: ") or 0)
         threshold = int(input("threshold [default 0]: ") or 0)
-        search_vector_point(search_img_path, COLLECTION_NAME,threshold,offset,limit)
+        search_vector_point(COLLECTION_NAME, search_img_path,threshold,offset,limit)
         
 
     elif(choice==6):

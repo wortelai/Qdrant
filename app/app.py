@@ -8,6 +8,7 @@ import base64
 import random
 import numpy as np
 import io
+import os
 
 
 app = FlaskLambda(__name__)
@@ -47,27 +48,17 @@ def delete_index():
 
 @app.route("/add_point", methods=["POST"])
 def add_point():
-    #data = request.forms
-    index_name = request.form.get('collection name')
-    #index_name = request.args.get('collection name')
-    #img_path = request.form.get('image path')
-    #index_name = request.form.get('collection name')
-    #img_path = data["image path"]
-    #img_bytes = bytes(img_utf, "utf-8")
-    #img_decoded = base64.b64decode(img_bytes)
-    #img = Image.open(BytesIO(request.files['file'].read()))
-    #img = Image.open(file)
     id = random.getrandbits(64)
-    #id=11334160272865621853
-    file = request.files['file']
-    read_file = file.read()
-    img_path = file.filename
-    #    print(f)
-    npimg = np.fromstring(read_file,np.uint8)
-    #img = cv2.imdecode(npimg,cv2.IMREAD_COLOR)
-    #img = base64.b64decode(npimg)
-    img = io.BytesIO(npimg)
-    img=Image.open(img)
+    data = request.get_json()
+    index_name = data['collection name']
+    img_path = data['path']
+    img_path = os.path.split(img_path)[-1]
+    image_data = data['image']
+    # Decode the base64-encoded image data
+    image_binary = base64.b64decode(image_data)
+    
+    # Open the binary image data with Image.open()
+    img = Image.open(BytesIO(image_binary))
     try:
         collection.add_points(img_path, img, index_name, id)
         return f'"{img_path}" image has been added to "{index_name}" collection'
@@ -78,10 +69,10 @@ def add_point():
 
 @app.route("/delete_point", methods=["POST"])
 def delete_point():
-    index_name = request.form.get('collection name')
-    file = request.files['file']
-    read_file = file.read()
-    img_path = file.filename
+    data = request.get_json()
+    index_name = data['collection name']
+    img_path = data['path']
+    img_path = os.path.split(img_path)[-1]
 
     
     try:
@@ -93,19 +84,20 @@ def delete_point():
 
 @app.route("/search", methods=["POST"])  # Search function using post (pass the image path in requests.post)
 def search():
-    collection_name = request.form.get('collection name')
-    limit = int(request.form.get('limit'))
-    offset = int(request.form.get('offset'))
-    threshold = int(request.form.get('threshold'))
-
-    file = request.files['file']
-    read_file = file.read()
-    npimg = np.fromstring(read_file,np.uint8)
-    img_b = io.BytesIO(npimg)
-    img = Image.open(img_b)
+    data = request.get_json()
+    index_name = data['collection name']
+    limit = int(data['limit'])
+    offset = int(data['offset'])
+    threshold = int(data['threshold'])
+    image_data = data['image']
+    # Decode the base64-encoded image data
+    image_binary = base64.b64decode(image_data)
+    
+    # Open the binary image data with Image.open()
+    img = Image.open(BytesIO(image_binary))
 
     results = collection.search(
-        img, collection_name, limit=limit, offset=offset, threshold=threshold
+        img, index_name, limit=limit, offset=offset, threshold=threshold
     )
     return f"{results}"
 
